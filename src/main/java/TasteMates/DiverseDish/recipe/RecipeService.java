@@ -6,9 +6,14 @@ import TasteMates.DiverseDish.recipe.dto.RecipeDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -16,12 +21,15 @@ public class RecipeService {
     private final RecipeRepo recipeRepo;
 
     // 레시피 생성
-    public RecipeDto create(
-            RecipeDto dto
-    ) {
+    public RecipeDto create(RecipeDto dto, MultipartFile main_image) throws IOException {
+        Files.createDirectories(Path.of("media"));
+        UUID uuid = UUID.randomUUID();
+        Path path = Path.of("media/" + main_image.getOriginalFilename() + "_" + uuid); // 해당 파일의 이름을 경로를 포함해서 지정
+        main_image.transferTo(path); // 위에서 지정한 경로로 해당 파일 저장
+
         return RecipeDto.fromEntity(recipeRepo.save(Recipe.builder()
-                .user(null) // TODO: User Entity 추가 필요
-                .main_image(dto.getMain_image())
+                .user(null)
+                .main_image(path.toString())
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .video_link(dto.getVideo_link())

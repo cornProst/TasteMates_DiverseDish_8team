@@ -2,7 +2,15 @@ package TasteMates.DiverseDish.recipe;
 
 import TasteMates.DiverseDish.recipe.dto.RecipeDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 
 @RestController
 @RequestMapping("/recipe")
@@ -12,11 +20,8 @@ public class RecipeController {
 
     // 레시피 생성
     @PostMapping
-    public RecipeDto create(
-            @RequestBody
-            RecipeDto dto
-    ) {
-        return recipeService.create(dto);
+    public RecipeDto create(@RequestPart(value = "dto") RecipeDto dto, @RequestPart(value = "main_image") MultipartFile main_image) throws IOException {
+        return recipeService.create(dto, main_image);
     }
 
     // 레시피 읽기
